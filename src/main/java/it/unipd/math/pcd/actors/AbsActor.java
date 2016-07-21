@@ -37,6 +37,9 @@
  */
 package it.unipd.math.pcd.actors;
 
+import javafx.util.Pair;
+import java.util.LinkedList;
+
 /**
  * Defines common properties of all actors.
  *
@@ -44,7 +47,14 @@ package it.unipd.math.pcd.actors;
  * @version 1.0
  * @since 1.0
  */
-public abstract class AbsActor<T extends Message> implements Actor<T> {
+public abstract class AbsActor<T extends Message> implements Actor<T>, Runnable {
+
+
+    /**
+     * Is a linked list representing the mailbox for the messages of the actor
+     */
+    private final LinkedList<Pair<T,ActorRef<T>>> mailBox = new LinkedList<>();
+    //private final LinkedList<Pair<T,ActorRef<? extends Message>>> mailBox = new LinkedList<>();
 
     /**
      * Self-reference of the actor
@@ -55,6 +65,7 @@ public abstract class AbsActor<T extends Message> implements Actor<T> {
      * Sender of the current message
      */
     protected ActorRef<T> sender;
+    //protected ActorRef<? extends Message> sender;
 
     /**
      * Sets the self-referece.
@@ -65,5 +76,28 @@ public abstract class AbsActor<T extends Message> implements Actor<T> {
     protected final Actor<T> setSelf(ActorRef<T> self) {
         this.self = self;
         return this;
+    }
+
+    /**
+     *
+     * @param mess The message
+     * @param messSender The sender of the message
+     * @return true if the message has been inserted in the mailBox
+     */
+    public final boolean insertNewMessage(final T mess, final ActorRef<T> messSender){
+        boolean inserted = false;
+        synchronized (mailBox){
+            inserted = mailBox.add(new Pair<T, ActorRef<T>>(mess,messSender));
+            mailBox.notifyAll();
+        }
+        return inserted;
+    }
+
+    /**
+     * Override of the run method to process the messages in the mailBox
+     */
+    @Override
+    public void run(){
+
     }
 }
