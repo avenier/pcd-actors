@@ -40,6 +40,8 @@ package it.unipd.math.pcd.actors;
 import it.unipd.math.pcd.actors.exceptions.NoSuchActorException;
 
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * A map-based implementation of the actor system.
@@ -53,7 +55,12 @@ public abstract class AbsActorSystem implements ActorSystem {
     /**
      * Associates every Actor created with an identifier.
      */
-    private Map<ActorRef<?>, Actor<?>> actors;
+    protected Map<ActorRef<?>, Actor<?>> actors;
+
+    /**
+     * Creates a not fixed ThreadPool to execute the actors
+     */
+    protected ExecutorService exec = Executors.newCachedThreadPool();
 
     @Override
     public ActorRef<? extends Message> actorOf(Class<? extends Actor> actor, ActorMode mode) {
@@ -67,6 +74,8 @@ public abstract class AbsActorSystem implements ActorSystem {
             Actor actorInstance = ((AbsActor) actor.newInstance()).setSelf(reference);
             // Associate the reference to the actor
             actors.put(reference, actorInstance);
+            // Makes the actorIstance be executed by the ThreadPool
+            exec.execute((AbsActor)actorInstance);
 
         } catch (InstantiationException | IllegalAccessException e) {
             throw new NoSuchActorException(e);
@@ -80,4 +89,37 @@ public abstract class AbsActorSystem implements ActorSystem {
     }
 
     protected abstract ActorRef createActorReference(ActorMode mode);
+
+    /**
+     * Retrieves the actor from the actors Map, if the actor in not present rises a NoSuchActorException
+     * @param aRef
+     * @return
+     */
+    protected AbsActor getActor(ActorRef aRef){
+        if(actors.containsKey(aRef)){
+            return (AbsActor) actors.get(aRef);
+        }else{
+            throw new NoSuchActorException();
+        }
+    }
+
+    /**
+     * Imprelentation of the soft-stop on an actor
+     * @param actor The actor to be stopped
+     */
+    @Override
+    public void stop(ActorRef<?> actor) {
+        getActor(actor).setStopSignal();
+        //remove the actor to prevent message to be sent to him
+        actors.remove(actor);
+    }
+
+    @Override
+    public void stop() {
+        for (Map.Entry<ActorRef<?>, Actor<?>> entry : actors.entrySet()){
+            //TODO: check if it makes sense
+            ((AbsActor)entry.getValue()).setStopSignal();
+            actors.remove(entry);
+        }
+    }
 }

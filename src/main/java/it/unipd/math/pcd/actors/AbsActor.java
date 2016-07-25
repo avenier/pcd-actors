@@ -39,6 +39,8 @@ package it.unipd.math.pcd.actors;
 
 import javafx.util.Pair;
 import java.util.LinkedList;
+import java.util.Queue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Defines common properties of all actors.
@@ -49,10 +51,15 @@ import java.util.LinkedList;
  */
 public abstract class AbsActor<T extends Message> implements Actor<T>, Runnable {
 
+    /**
+     * Used to leat an actor know it has to be stopped
+     */
+    private AtomicBoolean stopSignal = new AtomicBoolean(false);
 
     /**
      * Is a linked list representing the mailbox for the messages of the actor
      */
+    //private final Queue<Pair<T,ActorRef<T>>> mailBox = new LinkedList<>();
     private final LinkedList<Pair<T,ActorRef<T>>> mailBox = new LinkedList<>();
     //private final LinkedList<Pair<T,ActorRef<? extends Message>>> mailBox = new LinkedList<>();
 
@@ -79,7 +86,17 @@ public abstract class AbsActor<T extends Message> implements Actor<T>, Runnable 
     }
 
     /**
-     *
+     * Notify the actor that has to stop
+     */
+    protected final void setStopSignal(){
+        stopSignal.set(true);
+        synchronized (mailBox){
+            mailBox.notifyAll();
+        }
+    }
+
+    /**
+     * Inserts a new message in the mailBox
      * @param mess The message
      * @param messSender The sender of the message
      * @return true if the message has been inserted in the mailBox
@@ -98,6 +115,27 @@ public abstract class AbsActor<T extends Message> implements Actor<T>, Runnable 
      */
     @Override
     public void run(){
+        //TODO: check if has to be a AtomicBoolean
+        boolean stopActor = false;
+        while(!stopActor){
+            Pair<T,ActorRef<T>> processedMessage;
+            synchronized (mailBox){
+                while(mailBox.isEmpty()){
 
+                    //if the mailBox is empty and the stopSingnal has been sent the actor can be stopped
+                    if(stopSignal.get()){
+                        stopActor = true;
+                    }
+                    try{
+                        mailBox.wait();
+                    }catch (InterruptedException e){
+                        return;
+                    }
+                }
+                processedMessage = mailBox.remove();
+            }
+            sender = processedMessage.getValue();
+            receive(processedMessage.getKey());
+        }
     }
 }
