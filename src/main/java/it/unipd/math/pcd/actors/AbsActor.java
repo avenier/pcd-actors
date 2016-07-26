@@ -114,7 +114,6 @@ public abstract class AbsActor<T extends Message> implements Actor<T>, Runnable 
      */
     @Override
     public void run(){
-        //TODO: check if has to be a AtomicBoolean
         boolean stopActor = false;
         while(!stopActor){
             Pair<T,ActorRef<T>> processedMessage;

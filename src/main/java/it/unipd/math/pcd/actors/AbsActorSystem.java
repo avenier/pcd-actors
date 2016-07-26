@@ -118,7 +118,6 @@ public abstract class AbsActorSystem implements ActorSystem {
     @Override
     public void stop() {
         for (Map.Entry<ActorRef<?>, Actor<?>> entry : actors.entrySet()){
-            //TODO: check if it makes sense
             ((AbsActor)entry.getValue()).setStopSignal();
             actors.remove(entry);
         }
