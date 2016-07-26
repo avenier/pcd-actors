@@ -16,8 +16,6 @@ public final class ActorSystemImpl extends AbsActorSystem {
 
     public ActorSystemImpl(){
         LocalActorRef.aas = this;
-        actors = new HashMap<ActorRef<?>, Actor<?>>();
-        exec = Executors.newCachedThreadPool();
     }
 
     @Override

@@ -39,7 +39,6 @@ package it.unipd.math.pcd.actors;
 
 import javafx.util.Pair;
 import java.util.LinkedList;
-import java.util.Queue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**

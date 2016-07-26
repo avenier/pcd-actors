@@ -39,6 +39,7 @@ package it.unipd.math.pcd.actors;
 
 import it.unipd.math.pcd.actors.exceptions.NoSuchActorException;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -55,7 +56,7 @@ public abstract class AbsActorSystem implements ActorSystem {
     /**
      * Associates every Actor created with an identifier.
      */
-    protected Map<ActorRef<?>, Actor<?>> actors;
+    protected Map<ActorRef<?>, Actor<?>> actors = new HashMap<>();
 
     /**
      * Creates a not fixed ThreadPool to execute the actors

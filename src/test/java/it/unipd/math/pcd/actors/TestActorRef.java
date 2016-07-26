@@ -36,8 +36,7 @@
  * @since 1.0
  */
 package it.unipd.math.pcd.actors;
-
-import it.unipd.math.pcd.actors.*;
+import it.unipd.math.pcd.actors.impl.ActorSystemImpl;
 
 /**
  * Decorates an {@link ActorRef} adding the ability to get the underlying actor associated to the reference.
@@ -61,8 +60,7 @@ public class TestActorRef<T extends Message> implements ActorRef<T> {
      * @return An actor
      */
     public Actor<T> getUnderlyingActor(ActorSystem system) {
-        // TODO To implement
-        return null;
+        return ((ActorSystemImpl)system).getActor(reference);
     }
 
     @Override
