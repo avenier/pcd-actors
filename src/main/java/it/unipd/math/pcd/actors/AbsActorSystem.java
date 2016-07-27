@@ -63,6 +63,13 @@ public abstract class AbsActorSystem implements ActorSystem {
      */
     protected ExecutorService exec = Executors.newCachedThreadPool();
 
+    /**
+     * Creates an actor and puts it in the threadPool
+     * @param actor The type of actor that has to be created
+     * @param mode The mode of the actor requested
+     *
+     * @return
+     */
     @Override
     public ActorRef<? extends Message> actorOf(Class<? extends Actor> actor, ActorMode mode) {
 
@@ -110,15 +117,22 @@ public abstract class AbsActorSystem implements ActorSystem {
      */
     @Override
     public void stop(ActorRef<?> actor) {
+        //set the stop signal of the actor passed
         getActor(actor).setStopSignal();
         //remove the actor to prevent message to be sent to him
         actors.remove(actor);
     }
 
+    /**
+     * Implementation of the soft-stop of every actor
+     * Cycle through every entry on the actors map and sets the signal to stop the actor and removes it from the map
+     */
     @Override
     public void stop() {
         for (Map.Entry<ActorRef<?>, Actor<?>> entry : actors.entrySet()){
+            //Set the stop signal for the current actor in the collection
             ((AbsActor)entry.getValue()).setStopSignal();
+            //remove the actor to prevent message to be sent to him
             actors.remove(entry);
         }
     }

@@ -51,16 +51,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public abstract class AbsActor<T extends Message> implements Actor<T>, Runnable {
 
     /**
-     * Used to leat an actor know it has to be stopped
+     * Used to let an actor know it has to be stopped
      */
     private AtomicBoolean stopSignal = new AtomicBoolean(false);
 
     /**
      * Is a linked list representing the mailbox for the messages of the actor
      */
-    //private final Queue<Pair<T,ActorRef<T>>> mailBox = new LinkedList<>();
     private final LinkedList<Pair<T,ActorRef<T>>> mailBox = new LinkedList<>();
-    //private final LinkedList<Pair<T,ActorRef<? extends Message>>> mailBox = new LinkedList<>();
 
     /**
      * Self-reference of the actor
@@ -71,7 +69,6 @@ public abstract class AbsActor<T extends Message> implements Actor<T>, Runnable 
      * Sender of the current message
      */
     protected ActorRef<T> sender;
-    //protected ActorRef<? extends Message> sender;
 
     /**
      * Sets the self-referece.

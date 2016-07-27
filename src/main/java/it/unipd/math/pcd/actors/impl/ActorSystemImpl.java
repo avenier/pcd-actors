@@ -1,7 +1,6 @@
 package it.unipd.math.pcd.actors.impl;
 
 import it.unipd.math.pcd.actors.AbsActorSystem;
-import it.unipd.math.pcd.actors.Actor;
 import it.unipd.math.pcd.actors.ActorRef;
 import it.unipd.math.pcd.actors.LocalActorRef;
 
@@ -14,6 +13,11 @@ public final class ActorSystemImpl extends AbsActorSystem {
         LocalActorRef.aas = this;
     }
 
+    /**
+     * Creates a LOCAL actorReference
+     * @param mode
+     * @return
+     */
     @Override
     protected ActorRef createActorReference(ActorMode mode) {
         if(mode == ActorMode.LOCAL){
@@ -22,10 +26,4 @@ public final class ActorSystemImpl extends AbsActorSystem {
             throw new IllegalArgumentException();
         }
     }
-
-    /*
-    public <T extends Message> AbsActor<T> getActorPublic(ActorRef<T> ref){
-        return getActor(ref);
-    }
-    */
 }
